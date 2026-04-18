@@ -23,7 +23,7 @@ import logging
 import subprocess
 from PIL import Image, ImageFont 
 from logger import Logger
-from epd_helper import EPDHelper
+from epd_helper import EPDHelper, NullEPDHelper
 
 
 logger = Logger(name="shared.py", level=logging.DEBUG) # Create a logger object 
@@ -244,6 +244,15 @@ class SharedData:
     #         raise
     def initialize_epd_display(self):
         """Initialize the e-paper display."""
+        if os.environ.get('BJORN_HEADLESS') == '1':
+            logger.info("Headless mode: skipping hardware EPD init, using NullEPDHelper.")
+            self.width = self.config.get('ref_width', 122)
+            self.height = self.config.get('ref_height', 250)
+            self.screen_reversed = False
+            self.web_screen_reversed = False
+            self.epd_helper = NullEPDHelper(self.width, self.height)
+            return
+
         try:
             logger.info("Initializing EPD display...")
             time.sleep(1)

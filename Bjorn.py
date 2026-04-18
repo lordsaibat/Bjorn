@@ -96,7 +96,17 @@ class Bjorn:
             logger.info("Orchestrator thread is not running.")
 
     def is_wifi_connected(self):
-        """Checks for Wi-Fi connectivity using the nmcli command."""
+        """Checks for network connectivity. Uses ip route in headless/Docker mode."""
+        if os.environ.get('BJORN_HEADLESS') == '1':
+            try:
+                result = subprocess.run(
+                    ['ip', 'route', 'show', 'default'],
+                    capture_output=True, text=True
+                )
+                self.wifi_connected = bool(result.stdout.strip())
+            except Exception:
+                self.wifi_connected = True  # assume connected if check fails
+            return self.wifi_connected
         result = subprocess.Popen(['nmcli', '-t', '-f', 'active', 'dev', 'wifi'], stdout=subprocess.PIPE, text=True).communicate()[0]
         self.wifi_connected = 'yes' in result
         return self.wifi_connected

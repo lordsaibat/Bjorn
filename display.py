@@ -233,7 +233,17 @@ class Display:
     # # #         return False
 
     def is_wifi_connected(self):
-        """Check if WiFi is connected by checking the current SSID."""
+        """Check if network is available. Uses ip route in headless/Docker mode."""
+        if os.environ.get('BJORN_HEADLESS') == '1':
+            try:
+                result = subprocess.Popen(
+                    ['ip', 'route', 'show', 'default'],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+                )
+                output, _ = result.communicate()
+                return bool(output.strip())
+            except Exception:
+                return False
         try:
             result = subprocess.Popen(['iwgetid', '-r'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             ssid, error = result.communicate()
@@ -268,7 +278,7 @@ class Display:
             result = subprocess.Popen(['ip', 'neigh', 'show', 'dev', 'usb0'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             output, error = result.communicate()
             if result.returncode != 0:
-                logger.error(f"Error executing 'ip neigh show dev usb0': {error}")
+                logger.debug(f"usb0 interface not available: {error.strip()}")
                 return False
             return bool(output.strip())
         except Exception as e:

@@ -54,6 +54,10 @@ class WebUtils:
     def load_nmap_vuln_scanner(self, module_name):
         """Load the nmap vulnerability scanner"""
         self.nmap_vuln_scanner = NmapVulnScanner(self.shared_data)
+        self.nmap_vuln_scanner.action_name = 'NmapVulnScanner'
+        self.nmap_vuln_scanner.port = None
+        self.nmap_vuln_scanner.b_parent_action = None
+        self.actions.append(self.nmap_vuln_scanner)
 
     def load_action(self, module_name, action):
         """Load an action from the actions file"""

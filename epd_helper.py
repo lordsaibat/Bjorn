@@ -5,6 +5,33 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+class _NullEPD:
+    """Stub EPD with default e-paper dimensions for headless/Docker mode."""
+    width = 122
+    height = 250
+
+
+class NullEPDHelper:
+    """No-op EPD helper used when BJORN_HEADLESS=1 (Docker / non-RPi)."""
+
+    def __init__(self, width=122, height=250):
+        self.epd = _NullEPD()
+        self.epd.width = width
+        self.epd.height = height
+
+    def init_full_update(self):
+        pass
+
+    def init_partial_update(self):
+        pass
+
+    def display_partial(self, image):
+        pass
+
+    def sleep(self):
+        pass
+
 class EPDHelper:
     def __init__(self, epd_type):
         self.epd_type = epd_type

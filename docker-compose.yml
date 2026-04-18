@@ -1,0 +1,36 @@
+services:
+  bjorn:
+    build: .
+    image: bjorn:latest
+    container_name: bjorn
+
+    # Host networking lets Bjorn see the LAN directly (required for scanning)
+    # On macOS/Windows use the port-mapping alternative below instead.
+    network_mode: "host"
+
+    # Capabilities needed for nmap raw-socket and ARP scanning
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+    environment:
+      - BJORN_HEADLESS=1
+
+    # Persist data and config across container restarts
+    volumes:
+      - bjorn_data:/app/data
+      - bjorn_config:/app/config
+      - bjorn_backup:/app/backup
+
+    restart: unless-stopped
+
+    # Uncomment the section below and remove network_mode: host
+    # if you are on macOS or Windows (where host networking is not supported):
+    #
+    # ports:
+    #   - "8000:8000"
+
+volumes:
+  bjorn_data:
+  bjorn_config:
+  bjorn_backup:
